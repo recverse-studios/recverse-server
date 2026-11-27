@@ -9,7 +9,7 @@ const config = {
   // Server
   server: {
     host: process.env.SERVER_HOST || '0.0.0.0',
-    port: parseInt(process.env.SERVER_PORT || '3000', 10),
+    port: parseInt(process.env.PORT || process.env.SERVER_PORT || '3000', 10),
     env: process.env.NODE_ENV || 'development',
     domain: process.env.SERVER_DOMAIN || 'localhost',
     protocol: process.env.SERVER_PROTOCOL || 'http',

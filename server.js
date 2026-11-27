@@ -85,7 +85,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Register subdomain routes (so auth.*, accounts.*, api.*, etc. work without 404)
+// Register subdomain routes
 registerSubdomain('auth', authRouter);
 registerSubdomain('accounts', accountsRouter);
 registerSubdomain('api', apiRouter);
@@ -95,11 +95,11 @@ registerSubdomain('chat', chatRouter);
 registerSubdomain('econ', econRouter);
 registerSubdomain('admin', adminRouter);
 
-// CDN subdomains - serve images (avatars, banners, room images, etc.)
+// CDN subdomains
 registerSubdomain('cdn', cdnRouter);
 registerSubdomain('img', cdnRouter);
 
-// Stub services as subdomains too
+// Stub services as subdomains
 const stubServices = [
   'notify', 'leaderboard', 'roomcomments',
   'playersettings', 'studio', 'commerce', 'datacollection',
@@ -120,7 +120,7 @@ for (const service of stubServices) {
 // Apply subdomain routing middleware BEFORE path-based routes
 app.use(subdomainRoutingMiddleware);
 
-// Apply rate limiting to path-based routes (for direct access without subdomain)
+// Apply rate limiting
 app.use('/auth/connect/token', authLimiter);
 app.use('/account/create', authLimiter);
 app.use('/account/recoverpassword', authLimiter);
@@ -133,10 +133,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Health check (no auth, no rate limit)
+// Health check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'ok', 
+  res.json({
+    status: 'ok',
     service: 'recverse-server',
     version: '1.0.0',
     gameVersion: config.game.version,
@@ -145,10 +145,10 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Service Discovery (Name Server) - MUST be first for root path
+// Service Discovery (Name Server)
 app.use('/', nsRouter);
 
-// Mount service routers (path-based, for direct access without subdomain)
+// Mount service routers
 app.use('/accounts', accountsRouter);
 app.use('/auth', authRouter);
 app.use('/api', apiRouter);
@@ -157,10 +157,10 @@ app.use('/match', matchRouter);
 app.use('/chat', chatRouter);
 app.use('/econ', econRouter);
 
-// Admin routes (maintenance + broadcast)
+// Admin routes
 app.use('/admin', adminRouter);
 
-// Additional service stubs (path-based, for direct access without subdomain)
+// Service stubs
 for (const service of stubServices) {
   const stubRouter = express.Router();
   stubRouter.get('/health', (req, res) => {
@@ -177,16 +177,14 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  logger.error('HTTP', 'Unhandled error', { 
-    error: err.message, 
+  logger.error('HTTP', 'Unhandled error', {
+    error: err.message,
     stack: err.stack,
     path: req.path,
     method: req.method,
     requestId: req.id,
     host: req.headers.host,
   });
-  
-  // Don't leak error details in production
   const message = config.server.env === 'production' ? 'Internal server error' : err.message;
   res.status(500).json({ error: message });
 });
@@ -196,44 +194,35 @@ process.on('unhandledRejection', (reason, promise) => {
   logger.error('STARTUP', 'Unhandled Rejection at:', { promise, reason: reason?.message || reason });
 });
 
-// Initialize database, WebSocket server, maintenance, and start HTTP server
-async function start() {
-  let server = null;
-  try {
-    logger.startup('Starting RecVerse Server...');
-    
-    // Determine port (support both SERVER_PORT and PORT env vars for Northflank compatibility)
-    const port = parseInt(process.env.PORT || config.server.port || '3000', 10);
-    const host = config.server.host || '0.0.0.0';
-    
-    logger.startup(`Configuring server on ${host}:${port}`);
-    
-    // Initialize database
-    await initDatabase();
-    logger.startup('Database initialized');
-    
-    // Initialize maintenance system (loads persisted state, restarts pending countdown)
-    await initializeMaintenance();
-    logger.startup('Maintenance system initialized');
-    
-    // Create HTTP server explicitly so we can attach WebSocket server
-    server = http.createServer(app);
-    
-    // Handle server errors
-    server.on('error', (err) => {
-      logger.error('HTTP', 'Server error', { error: err.message, code: err.code });
-      if (err.code === 'EADDRINUSE') {
-        logger.error('HTTP', `Port ${port} is already in use`);
-        process.exit(1);
-      }
-    });
-    
-    // Initialize WebSocket/SignalR server for notification delivery
-    initializeWebSocketServer(server, { path: '/hub/v1' });
-    logger.startup('WebSocket/SignalR server initialized at /hub/v1');
-    
-    // Start HTTP server (WebSocket server is attached to the same instance)
-    await new Promise((resolve, reject) => {
+// Start server
+function start() {
+  const port = parseInt(process.env.PORT || process.env.SERVER_PORT || config.server.port || '3000', 10);
+  const host = process.env.SERVER_HOST || config.server.host || '0.0.0.0';
+
+  logger.startup('Starting RecVerse Server...');
+  logger.startup(`Configuring server on ${host}:${port}`);
+
+  initDatabase()
+    .then(() => {
+      logger.startup('Database initialized');
+      return initializeMaintenance();
+    })
+    .then(() => {
+      logger.startup('Maintenance system initialized');
+
+      const server = http.createServer(app);
+
+      server.on('error', (err) => {
+        logger.error('HTTP', 'Server error', { error: err.message, code: err.code });
+        if (err.code === 'EADDRINUSE') {
+          logger.error('HTTP', `Port ${port} is already in use`);
+          process.exit(1);
+        }
+      });
+
+      initializeWebSocketServer(server, { path: '/hub/v1' });
+      logger.startup('WebSocket/SignalR server initialized at /hub/v1');
+
       server.listen(port, host, () => {
         logger.startup(`Server listening on ${host}:${port}`);
         logger.startup(`Base URL: ${config.server.baseUrl}`);
@@ -242,57 +231,40 @@ async function start() {
         if (config.game.rolloutVersions.length > 0) {
           logger.startup(`Rollout versions: ${config.game.rolloutVersions.join(', ')}`);
         }
-        
-        // Log service endpoints
+
         const endpoints = buildEndpoints(config.server.domain);
         logger.startup('Service endpoints:');
         for (const [service, url] of Object.entries(endpoints)) {
           logger.startup(`  ${service}: ${url}`);
         }
-        
+
         logger.startup(`  WebSocket/SignalR: ws://${host}:${port}/hub/v1`);
         logger.startup(`  Admin API: http://${host}:${port}/admin`);
         logger.startup(`  Subdomain routing: auth.*, accounts.*, api.*, rooms.*, match.*, chat.*, econ.*, cdn.*, img.*`);
-        
-        resolve();
       });
-    });
-    
-    // Graceful shutdown
-    const shutdown = async (signal) => {
-      logger.shutdown(`${signal} received, shutting down...`);
-      
-      // Shutdown broadcast system (close all WebSocket connections)
-      shutdownBroadcast();
-      
-      // Shutdown maintenance system (clear timers, persist state)
-      shutdownMaintenance();
-      
-      if (server) {
+
+      const shutdown = async (signal) => {
+        logger.shutdown(`${signal} received, shutting down...`);
+        shutdownBroadcast();
+        shutdownMaintenance();
         server.close(async () => {
           logger.shutdown('HTTP server closed');
           await closeDb();
           process.exit(0);
         });
-      } else {
-        await closeDb();
-        process.exit(0);
-      }
-      
-      // Force close after 10 seconds
-      setTimeout(() => {
-        logger.error('SHUTDOWN', 'Forced shutdown after timeout');
-        process.exit(1);
-      }, 10000);
-    };
-    
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
-    
-  } catch (error) {
-    logger.error('STARTUP', 'Failed to start server', { error: error.message, stack: error.stack });
-    process.exit(1);
-  }
+        setTimeout(() => {
+          logger.error('SHUTDOWN', 'Forced shutdown after timeout');
+          process.exit(1);
+        }, 10000);
+      };
+
+      process.on('SIGTERM', () => shutdown('SIGTERM'));
+      process.on('SIGINT', () => shutdown('SIGINT'));
+    })
+    .catch((err) => {
+      logger.error('STARTUP', 'Failed to start server', { error: err.message, stack: err.stack });
+      process.exit(1);
+    });
 }
 
 start();
