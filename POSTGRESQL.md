@@ -1,104 +1,96 @@
 # RecVerse PostgreSQL Configuration
 
-## Opção A: Variáveis individuais (tradicional)
+## Option A: Individual variables (traditional)
 
 ```env
 DB_CLIENT=pg
 PG_HOST=localhost
 PG_PORT=5432
 PG_USER=recverse
-PG_PASSWORD=sua_senha
+PG_PASSWORD=your_password
 PG_DATABASE=recverse
 PG_SSL=false
 PG_MAX_CONNECTIONS=20
 ```
 
-## Opção B: Connection string única (recomendado - mais simples)
+## Option B: Single connection string (recommended - simpler)
 
-Use uma única variável `DATABASE_URL` no formato padrão PostgreSQL:
+Use a single `DATABASE_URL` variable in the standard PostgreSQL format:
 
 ```env
 DB_CLIENT=pg
-DATABASE_URL=postgresql://recverse:sua_senha@localhost:5432/recverse?ssl=true
+DATABASE_URL=postgresql://recverse:your_password@localhost:5432/recverse?ssl=true
 ```
 
-### Formato da DATABASE_URL
+### DATABASE_URL Format
 
 ```
-postgresql://[usuario]:[senha]@[host]:[porta]/[banco]?[opcoes]
+postgresql://[user]:[password]@[host]:[port]/[database]?[options]
 ```
 
-| Parte | Descrição | Exemplo |
-|-------|-----------|---------|
-| `postgresql://` | Protocolo obrigatório | `postgresql://` |
-| `usuario` | Usuário do banco | `recverse` |
-| `senha` | Senha do usuário | `MinhaSenha123` |
-| `host` | Servidor do banco | `localhost` ou `meu-banco.render.com` |
-| `porta` | Porta do PostgreSQL | `5432` |
-| `banco` | Nome do banco de dados | `recverse` |
-| `ssl=true` | Habilitar SSL/TLS | `?ssl=true` |
+| Part | Description | Example |
+|------|-------------|---------|
+| `postgresql://` | Required protocol | `postgresql://` |
+| `user` | Database user | `recverse` |
+| `password` | User password | `MyPassword123` |
+| `host` | Database server | `localhost` or `my-db.render.com` |
+| `port` | PostgreSQL port | `5432` |
+| `database` | Database name | `recverse` |
+| `ssl=true` | Enable SSL/TLS | `?ssl=true` |
 
-### Exemplos práticos
+### Practical Examples
 
-**Local (sem SSL):**
+**Local (no SSL):**
 ```env
-DATABASE_URL=postgresql://recverse:senha123@localhost:5432/recverse
+DATABASE_URL=postgresql://recverse:password123@localhost:5432/recverse
 ```
 
-**Render.com (com SSL):**
+**Render.com (with SSL):**
 ```env
-DATABASE_URL=postgresql://recverse:senha123@dpg-xxxxx-a.oregon-postgres.render.com:5432/recverse?ssl=true
+DATABASE_URL=postgresql://recverse:password123@dpg-xxxxx-a.oregon-postgres.render.com:5432/recverse?ssl=true
 ```
 
-**Neon.tech (com SSL):**
+**Neon.tech (with SSL):**
 ```env
-DATABASE_URL=postgresql://recverse:senha123@ep-xxx-xxx.us-east-1.aws.neon.tech:5432/recverse?ssl=true
+DATABASE_URL=postgresql://recverse:password123@ep-xxx-xxx.us-east-1.aws.neon.tech:5432/recverse?ssl=true
 ```
 
-**Supabase (com SSL):**
+**Supabase (with SSL):**
 ```env
-DATABASE_URL=postgresql://postgres:senha@db.xxx.supabase.co:5432/postgres?ssl=true
+DATABASE_URL=postgresql://postgres:password@db.xxx.supabase.co:5432/postgres?ssl=true
 ```
 
----
+## Configuration Priority
 
-## Prioridade de configuração
+When `DATABASE_URL` is defined, it **overrides** all individual variables (`PG_HOST`, `PG_USER`, `PG_PASSWORD`, etc.).
 
-Quando `DATABASE_URL` está definida, ela **sobrescreve** todas as variáveis individuais (`PG_HOST`, `PG_USER`, etc.).
+Priority order:
+1. `DATABASE_URL` (if it starts with `postgresql://`)
+2. Individual variables (`PG_HOST`, `PG_USER`, `PG_PASSWORD`, etc.)
+3. Default values
 
-Ordem de precedência:
-1. `DATABASE_URL` (se começar com `postgresql://`)
-2. Variáveis individuais (`PG_HOST`, `PG_USER`, `PG_PASSWORD`, etc.)
-3. Valores padrão
-
----
-
-## Setup do banco (SQL)
+## Database Setup (SQL)
 
 ```sql
--- Criar usuário e banco
-CREATE USER recverse WITH PASSWORD 'sua_senha';
+-- Create user and database
+CREATE USER recverse WITH PASSWORD 'your_password';
 CREATE DATABASE recverse OWNER recverse;
 GRANT ALL PRIVILEGES ON DATABASE recverse TO recverse;
 
--- Conectar ao banco e conceder privilégios
+-- Connect to the database and grant schema privileges
 \c recverse
 GRANT ALL ON SCHEMA public TO recverse;
 ```
 
----
+## Migrations
 
-## Migrações
-
-O servidor executa migrações automaticamente no startup. Para rodar manualmente:
+The server runs migrations automatically on startup. To run manually:
 
 ```bash
 node -e "require('./verse-db').initDatabase()"
 ```
 
----
-
-## .env completo (exemplo com PostgreSQL linha única)
+## Complete .env (example with single-line PostgreSQL)
 
 ```env
 # --- Server ---
@@ -108,9 +100,9 @@ NODE_ENV=development
 SERVER_DOMAIN=localhost
 SERVER_PROTOCOL=http
 
-# --- Database (PostgreSQL via linha única) ---
+# --- Database (PostgreSQL via single line) ---
 DB_CLIENT=pg
-DATABASE_URL=postgresql://recverse:sua_senha@localhost:5432/recverse?ssl=false
+DATABASE_URL=postgresql://recverse:your_password@localhost:5432/recverse?ssl=false
 
 # --- JWT ---
 JWT_SECRET=recverse-dev-secret-change-in-production

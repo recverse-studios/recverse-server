@@ -29,7 +29,7 @@ function registerSubdomain(subdomain, router) {
 /**
  * Middleware de roteamento por subdomínio.
  * Detecta o subdomínio do Host header e encaminha para o router correto.
- * Se não houver subdomínio correspondente, passa para o próximo middleware.
+ * If no matching subdomain, passes to the next middleware.
  *
  * @param {import('express').Request} req
  * @param {import('express').Response} res
@@ -42,7 +42,7 @@ function subdomainRoutingMiddleware(req, res, next) {
   // Remove porta se presente
   const hostname = host.split(':')[0];
 
-  // Se é exatamente o domínio base ou localhost, sem subdomínio
+  // If it's exactly the base domain or localhost, no subdomain
   if (hostname === domain || hostname === 'localhost' || hostname === '127.0.0.1') {
     return next();
   }
@@ -67,7 +67,7 @@ function subdomainRoutingMiddleware(req, res, next) {
     return router(req, res, next);
   }
 
-  // Subdomínio não registrado - continua para próximo middleware (404 handler)
+  // Subdomain not registered - continue to next middleware (404 handler)
   next();
 }
 
