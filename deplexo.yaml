@@ -1,0 +1,94 @@
+# deplexo.yaml
+# Configuração de deploy para Deplexo Platform
+# https://docs.deplexo.com
+
+version: 1
+type: webserver
+
+build:
+  framework: dockerfile
+  dockerfile: Dockerfile
+
+run:
+  command: node server.js
+  port: 3000
+
+env:
+  - key: NODE_ENV
+    value: production
+  - key: SERVER_HOST
+    value: 0.0.0.0
+  - key: SERVER_PORT
+    value: 3000
+  - key: SERVER_DOMAIN
+    value: recverse.deplexo.app
+  - key: SERVER_PROTOCOL
+    value: https
+  - key: DB_CLIENT
+    value: pg
+  - key: DATABASE_URL
+    value: postgresql://postgres:cTsVij3oRR0DOvRL71dkzPRD@recversedatabase-grim-ledge-pooler.sage.cloud.layerbase.dev:5432/recversedatabase?sslmode=require
+  - key: JWT_SECRET
+    value: recverse-deplexo-secret-change-in-production
+  - key: JWT_ACCESS_TTL
+    value: 3600
+  - key: JWT_REFRESH_TTL
+    value: 604800
+  - key: GAME_VERSION
+    value: 20230201
+  - key: SUPPORTED_GAME_VERSIONS
+    value: 20230201,20230414,20230616,20231207
+  - key: ROLLOUT_GAME_VERSIONS
+    value: ""
+  - key: RATE_LIMIT_WINDOW
+    value: 900000
+  - key: RATE_LIMIT_MAX
+    value: 100
+  - key: RATE_LIMIT_AUTH_MAX
+    value: 10
+  - key: CORS_ORIGIN
+    value: "*"
+  - key: LOG_LEVEL
+    value: info
+  - key: LOG_FILE
+    value: ./verse.log
+  - key: LOG_CONSOLE
+    value: "true"
+  - key: ENABLE_IMAGE_SIGNING
+    value: "true"
+  - key: ENABLE_TELEMETRY
+    value: "false"
+  - key: ENABLE_EAC
+    value: "true"
+  - key: MAX_ACCOUNTS_PER_PLATFORM_ID
+    value: "3"
+  - key: MAX_ACCOUNTS_PER_IP
+    value: "3"
+  - key: MAX_ACCOUNTS_PER_DEVICE_ID
+    value: "3"
+  - key: PASSWORD_SIGNUP
+    value: "false"
+  - key: EMAIL_ENABLED
+    value: "false"
+  - key: STEAM_ENABLED
+    value: "false"
+  - key: META_ENABLED
+    value: "false"
+  - key: DISCORD_ENABLED
+    value: "false"
+  - key: PHOTON_REALTIME_APP_ID
+    value: ""
+  - key: PHOTON_VOICE_APP_ID
+    value: ""
+  - key: PHOTON_CHAT_APP_ID
+    value: ""
+  - key: PHOTON_NAME_SERVER
+    value: ""
+  - key: PHOTON_NAME_SERVER_PORT
+    value: "0"
+
+healthcheck:
+  path: /health
+  interval: 30s
+  timeout: 5s
+  retries: 3
