@@ -1,0 +1,66 @@
+# ============================================================
+# RecVerse Server - northflank.yaml
+# Configuração de deploy para Northflank
+# Suporte a subdomínios: auth.*, accounts.*, api.*, rooms.*, match.*, chat.*, econ.*
+# ============================================================
+
+version: 1
+
+services:
+  - name: recverse-server
+    type: webserver
+    runtime: node
+    version: "20"
+    build_dockerfile: Dockerfile
+    ports:
+      - port: 3000
+        protocol: http
+        expose: true
+    env:
+      - key: NODE_ENV
+        value: production
+      - key: SERVER_HOST
+        value: 0.0.0.0
+      - key: SERVER_PORT
+        value: 3000
+      - key: SERVER_DOMAIN
+        value: recverse.northflank.app
+      - key: SERVER_PROTOCOL
+        value: https
+      - key: DATABASE_URL
+        value: postgresql://postgres:cTsVij3oRR0DOvRL71dkzPRD@recversedatabase-grim-ledge-pooler.sage.cloud.layerbase.dev:5432/recversedatabase?sslmode=require
+      - key: DB_CLIENT
+        value: pg
+      - key: JWT_SECRET
+        value: recverse-northflank-secret-change-in-production
+      - key: JWT_ACCESS_TTL
+        value: 3600
+      - key: JWT_REFRESH_TTL
+        value: 604800
+      - key: GAME_VERSION
+        value: 20230201
+      - key: SUPPORTED_GAME_VERSIONS
+        value: 20230201,20230414,20230616,20231207
+      - key: RATE_LIMIT_WINDOW
+        value: 900000
+      - key: RATE_LIMIT_MAX
+        value: 100
+      - key: RATE_LIMIT_AUTH_MAX
+        value: 10
+      - key: CORS_ORIGIN
+        value: "*"
+      - key: LOG_LEVEL
+        value: info
+      - key: LOG_CONSOLE
+        value: "true"
+      - key: ENABLE_IMAGE_SIGNING
+        value: "true"
+      - key: ENABLE_TELEMETRY
+        value: "false"
+      - key: ENABLE_EAC
+        value: "true"
+    healthcheck:
+      path: /health
+      interval: 30s
+      timeout: 5s
+      retries: 3

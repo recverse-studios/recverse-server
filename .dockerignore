@@ -1,0 +1,32 @@
+# ============================================================
+# RecVerse Server - .dockerignore
+# ============================================================
+
+node_modules
+npm-debug.log
+vercel.log
+*.log
+database/
+*.db
+*.sqlite
+*.sqlite3
+.env
+.git
+.github
+.reference/
+*.md
+Dockerfile
+.dockerignore
+docker-compose.yml
+northflank.yml
+northflank.yaml
+performance2.js
+performance-report.json
+server.log
+start_perf.bat
+start_optimized.bat
+test_pg_adapter.js
+notification-maintenance.test.js
+__tests__/
+coverage/
+*.test.js

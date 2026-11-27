@@ -1,0 +1,37 @@
+# ============================================================
+# RecVerse Server - docker-compose.yml
+# Deploy local com Docker Compose
+# ============================================================
+
+version: '3.8'
+
+services:
+  recverse-server:
+    build: .
+    container_name: recverse-server
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    volumes:
+      - ./database:/app/database
+      - ./verse.log:/app/verse.log
+    restart: unless-stopped
+    depends_on:
+      - recverse-db
+
+  recverse-db:
+    image: postgres:15-alpine
+    container_name: recverse-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: cTsVij3oRR0DOvRL71dkzPRD
+      POSTGRES_DB: recversedatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - recverse-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  recverse-db-data:

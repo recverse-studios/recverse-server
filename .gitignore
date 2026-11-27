@@ -1,0 +1,61 @@
+# ============================================================
+# RecVerse Server - .gitignore
+# ============================================================
+
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables (SENSITIVE - do not commit)
+.env
+.env.local
+.env.production.local
+
+# Database files
+database/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/
+verse.log
+server.log
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Performance test artifacts
+performance2.js
+performance-report.json
+start_perf.bat
+start_optimized.bat
+test_pg_adapter.js
+test_subdomain.js
+
+# Misc
+*.tmp
+*.bak
+
+# Reference submodule (external)
+.reference/

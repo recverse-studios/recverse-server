@@ -1,0 +1,51 @@
+{
+  "name": "recverse-server",
+  "version": "1.0.0",
+  "description": "RecVerse Server - Monolithic Node.js implementation for Rec Room private server (February 2023 build)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "jest --coverage",
+    "test:watch": "jest --watch",
+    "migrate": "node migrations/run.js",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "recroom",
+    "private-server",
+    "recverse",
+    "recflare"
+  ],
+  "author": "RecVerse Team",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.3.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
+    "pg": "^8.23.1",
+    "sqlite3": "^5.1.7",
+    "uuid": "^9.0.1",
+    "ws": "^8.17.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^\\.\\./\\.\\./verse-config$": "<rootDir>/verse-config.js",
+      "^\\.\\./\\.\\./verse-logger$": "<rootDir>/verse-logger.js"
+    }
+  }
+}
