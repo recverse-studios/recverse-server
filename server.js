@@ -191,10 +191,22 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: message });
 });
 
+// Unhandled promise rejection handler
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('STARTUP', 'Unhandled Rejection at:', { promise, reason: reason?.message || reason });
+});
+
 // Initialize database, WebSocket server, maintenance, and start HTTP server
 async function start() {
+  let server = null;
   try {
     logger.startup('Starting RecVerse Server...');
+    
+    // Determine port (support both SERVER_PORT and PORT env vars for Northflank compatibility)
+    const port = parseInt(process.env.PORT || config.server.port || '3000', 10);
+    const host = config.server.host || '0.0.0.0';
+    
+    logger.startup(`Configuring server on ${host}:${port}`);
     
     // Initialize database
     await initDatabase();
@@ -205,32 +217,45 @@ async function start() {
     logger.startup('Maintenance system initialized');
     
     // Create HTTP server explicitly so we can attach WebSocket server
-    const server = http.createServer(app);
+    server = http.createServer(app);
+    
+    // Handle server errors
+    server.on('error', (err) => {
+      logger.error('HTTP', 'Server error', { error: err.message, code: err.code });
+      if (err.code === 'EADDRINUSE') {
+        logger.error('HTTP', `Port ${port} is already in use`);
+        process.exit(1);
+      }
+    });
     
     // Initialize WebSocket/SignalR server for notification delivery
     initializeWebSocketServer(server, { path: '/hub/v1' });
     logger.startup('WebSocket/SignalR server initialized at /hub/v1');
     
     // Start HTTP server (WebSocket server is attached to the same instance)
-    server.listen(config.server.port, config.server.host, () => {
-      logger.startup(`Server listening on ${config.server.host}:${config.server.port}`);
-      logger.startup(`Base URL: ${config.server.baseUrl}`);
-      logger.startup(`Game version: ${config.game.version}`);
-      logger.startup(`Supported versions: ${config.game.supportedVersions.join(', ')}`);
-      if (config.game.rolloutVersions.length > 0) {
-        logger.startup(`Rollout versions: ${config.game.rolloutVersions.join(', ')}`);
-      }
-      
-      // Log service endpoints
-      const endpoints = buildEndpoints(config.server.domain);
-      logger.startup('Service endpoints:');
-      for (const [service, url] of Object.entries(endpoints)) {
-        logger.startup(`  ${service}: ${url}`);
-      }
-      
-      logger.startup(`  WebSocket/SignalR: ws://${config.server.host}:${config.server.port}/hub/v1`);
-      logger.startup(`  Admin API: http://${config.server.host}:${config.server.port}/admin`);
-      logger.startup(`  Subdomain routing: auth.*, accounts.*, api.*, rooms.*, match.*, chat.*, econ.*`);
+    await new Promise((resolve, reject) => {
+      server.listen(port, host, () => {
+        logger.startup(`Server listening on ${host}:${port}`);
+        logger.startup(`Base URL: ${config.server.baseUrl}`);
+        logger.startup(`Game version: ${config.game.version}`);
+        logger.startup(`Supported versions: ${config.game.supportedVersions.join(', ')}`);
+        if (config.game.rolloutVersions.length > 0) {
+          logger.startup(`Rollout versions: ${config.game.rolloutVersions.join(', ')}`);
+        }
+        
+        // Log service endpoints
+        const endpoints = buildEndpoints(config.server.domain);
+        logger.startup('Service endpoints:');
+        for (const [service, url] of Object.entries(endpoints)) {
+          logger.startup(`  ${service}: ${url}`);
+        }
+        
+        logger.startup(`  WebSocket/SignalR: ws://${host}:${port}/hub/v1`);
+        logger.startup(`  Admin API: http://${host}:${port}/admin`);
+        logger.startup(`  Subdomain routing: auth.*, accounts.*, api.*, rooms.*, match.*, chat.*, econ.*, cdn.*, img.*`);
+        
+        resolve();
+      });
     });
     
     // Graceful shutdown
@@ -243,11 +268,16 @@ async function start() {
       // Shutdown maintenance system (clear timers, persist state)
       shutdownMaintenance();
       
-      server.close(async () => {
-        logger.shutdown('HTTP server closed');
+      if (server) {
+        server.close(async () => {
+          logger.shutdown('HTTP server closed');
+          await closeDb();
+          process.exit(0);
+        });
+      } else {
         await closeDb();
         process.exit(0);
-      });
+      }
       
       // Force close after 10 seconds
       setTimeout(() => {
