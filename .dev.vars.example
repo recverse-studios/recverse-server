@@ -1,0 +1,79 @@
+# RecVerse Server - Development Environment Variables
+# Copy this file to .dev.vars for local development with `wrangler dev`
+# NEVER commit real secrets to version control
+
+# Server
+SERVER_HOST=0.0.0.0
+SERVER_PORT=3000
+NODE_ENV=development
+SERVER_DOMAIN=localhost
+SERVER_PROTOCOL=http
+
+# Database - PostgreSQL via Hyperdrive (Layerbase)
+# Get this from Cloudflare Hyperdrive dashboard after creating a database
+DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
+DB_CLIENT=pg
+
+# JWT Authentication
+# Generate a strong secret: openssl rand -base64 32
+JWT_SECRET=recverse-dev-secret-change-in-production
+JWT_ACCESS_TTL=3600
+JWT_REFRESH_TTL=604800
+
+# Rate Limiting
+RATE_LIMIT_WINDOW=900000
+RATE_LIMIT_MAX=100
+RATE_LIMIT_AUTH_MAX=10
+
+# CORS
+CORS_ORIGIN=http://localhost:3000
+
+# Game Version (February 2023 build)
+GAME_VERSION=20230201
+SUPPORTED_GAME_VERSIONS=20230201,20230414,20230616,20231207
+ROLLOUT_GAME_VERSIONS=
+
+# Account Limits
+MAX_ACCOUNTS_PER_PLATFORM_ID=3
+MAX_ACCOUNTS_PER_IP=3
+MAX_ACCOUNTS_PER_DEVICE_ID=3
+PASSWORD_SIGNUP=false
+
+# Email (placeholder)
+EMAIL_ENABLED=false
+EMAIL_HOST=
+EMAIL_PORT=587
+EMAIL_USER=
+EMAIL_PASS=
+EMAIL_FROM=noreply@recverse.local
+EMAIL_SENDER=RecVerse <noreply@recverse.local>
+
+# Steam (optional)
+STEAM_ENABLED=false
+STEAM_API_KEY=
+
+# Meta/Oculus (optional)
+META_ENABLED=false
+META_APP_SECRET=
+
+# Discord (optional)
+DISCORD_ENABLED=false
+DISCORD_CLIENT_ID=
+DISCORD_CLIENT_SECRET=
+DISCORD_ROLLOUT_ROLE_IDS=
+
+# Photon (optional)
+PHOTON_REALTIME_APP_ID=
+PHOTON_VOICE_APP_ID=
+PHOTON_CHAT_APP_ID=
+PHOTON_NAME_SERVER=
+PHOTON_NAME_SERVER_PORT=0
+
+# Logging
+LOG_LEVEL=debug
+LOG_CONSOLE=true
+
+# Features
+ENABLE_IMAGE_SIGNING=true
+ENABLE_TELEMETRY=false
+ENABLE_EAC=true

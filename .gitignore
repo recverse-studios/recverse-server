@@ -12,6 +12,8 @@ yarn-error.log*
 .env
 .env.local
 .env.production.local
+.dev.vars
+.dev.vars.local
 
 # Database files
 database/
@@ -29,6 +31,8 @@ server.log
 dist/
 build/
 *.tsbuildinfo
+.wrangler/
+.wrangler/
 
 # IDE
 .vscode/

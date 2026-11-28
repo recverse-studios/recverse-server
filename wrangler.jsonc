@@ -1,0 +1,98 @@
+# wrangler.jsonc
+// Cloudflare Workers configuration for RecVerse Server
+// Layerbase PostgreSQL via Hyperdrive
+
+{
+  // Worker name
+  "name": "recverse-server",
+
+  // Main entry point
+  "main": "src/index.js",
+
+  // Compatibility date - important for Workers features
+  "compatibility_date": "2026-11-27",
+
+  // Enable Node.js compatibility for jsonwebtoken, bcryptjs, etc.
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Workers build configuration
+  "upload_format": "service",
+
+  // Environment bindings
+  "vars": {
+    "NODE_ENV": "production",
+    "GAME_VERSION": "20230201",
+    "SUPPORTED_GAME_VERSIONS": "20230201,20230414,20230616,20231207",
+    "ROLLOUT_GAME_VERSIONS": "",
+    "SERVER_HOST": "0.0.0.0",
+    "SERVER_PORT": "3000",
+    "SERVER_DOMAIN": "recverse.workers.dev",
+    "SERVER_PROTOCOL": "https",
+    "CORS_ORIGIN": "*",
+    "LOG_LEVEL": "info",
+    "LOG_CONSOLE": "true",
+    "ENABLE_IMAGE_SIGNING": "true",
+    "ENABLE_TELEMETRY": "false",
+    "ENABLE_EAC": "true",
+    "MAX_ACCOUNTS_PER_PLATFORM_ID": "3",
+    "MAX_ACCOUNTS_PER_IP": "3",
+    "MAX_ACCOUNTS_PER_DEVICE_ID": "3",
+    "PASSWORD_SIGNUP": "false",
+    "STEAM_ENABLED": "false",
+    "META_ENABLED": "false",
+    "DISCORD_ENABLED": "false",
+    "ENABLE_SERVICE_DISCOVERY": "true",
+  },
+
+  // Secrets (set via `wrangler secret put`)
+  // JWT_SECRET - required
+  // DATABASE_URL or HYPERDRIVE connection - required
+
+  // Hyperdrive database connection (Layerbase PostgreSQL)
+  // Uncomment and configure after creating Hyperdrive database:
+  // "hyperdrive": [
+  //   {
+  //     "binding": "DB",
+  //     "hyperdrive_id": "<your-hyperdrive-id>"
+  //   }
+  // ],
+
+  // KV namespace for rate limiting and caching
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "RATE_LIMIT_KV",
+  //     "id": "<your-kv-id>",
+  //     "preview_id": "<your-preview-kv-id>"
+  //   },
+  //   {
+  //     "binding": "CACHE_KV",
+  //     "id": "<your-cache-kv-id>",
+  //     "preview_id": "<your-preview-cache-kv-id>"
+  //   }
+  // ],
+
+  // Observability
+  "observability": {
+    "enabled": true
+  },
+
+  // Upload settings
+  "upload": {
+    "format": "service",
+    "include": [
+      "src/**/*.js",
+      "migrations/**/*.sql",
+      "package.json",
+      "package-lock.json",
+    ],
+    "exclude": [
+      ".git/**",
+      "node_modules/**",
+      "database/**",
+      "*.log",
+      ".env",
+      ".dev.vars",
+      "tests/**",
+    ],
+  },
+}
