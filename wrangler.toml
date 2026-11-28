@@ -1,0 +1,95 @@
+name = "recverse-server"
+main = "index.js"
+compatibility_date = "2024-11-27"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+NODE_ENV = "production"
+SERVER_HOST = "0.0.0.0"
+SERVER_PORT = "3000"
+SERVER_DOMAIN = "localhost"
+SERVER_PROTOCOL = "http"
+CORS_ORIGIN = "*"
+LOG_LEVEL = "info"
+LOG_FILE = "./verse.log"
+LOG_CONSOLE = "true"
+
+# JWT Configuration
+JWT_SECRET = "recverse-dev-secret-change-in-production"
+JWT_ACCESS_TTL = "3600"
+JWT_REFRESH_TTL = "604800"
+JWT_ISSUER = "recverse"
+JWT_AUDIENCE = "recverse-client"
+
+# Rate Limiting
+RATE_LIMIT_WINDOW = "900000"
+RATE_LIMIT_MAX = "100"
+RATE_LIMIT_AUTH_MAX = "10"
+
+# CORS
+CORS_ORIGIN = "*"
+CORS_CREDENTIALS = "true"
+
+# Game Version (February 2023 build)
+GAME_VERSION = "20230201"
+SUPPORTED_GAME_VERSIONS = "20230201,20230414,20230616,20231207"
+ROLLOUT_GAME_VERSIONS = ""
+
+# Account Limits
+MAX_ACCOUNTS_PER_PLATFORM_ID = "3"
+MAX_ACCOUNTS_PER_IP = "3"
+MAX_ACCOUNTS_PER_DEVICE_ID = "3"
+PASSWORD_SIGNUP = "false"
+
+# Email (placeholder - integrate with actual email service)
+EMAIL_ENABLED = "false"
+EMAIL_HOST = ""
+EMAIL_PORT = "587"
+EMAIL_USER = ""
+EMAIL_PASS = ""
+EMAIL_FROM = "noreply@recverse.local"
+EMAIL_SENDER = "RecVerse <noreply@recverse.local>"
+
+# Steam
+STEAM_ENABLED = "false"
+STEAM_API_KEY = ""
+
+# Meta/Oculus
+META_ENABLED = "false"
+META_APP_SECRET = ""
+
+# Discord
+DISCORD_ENABLED = "false"
+DISCORD_CLIENT_ID = ""
+DISCORD_CLIENT_SECRET = ""
+DISCORD_ROLLOUT_ROLE_IDS = ""
+
+# Photon
+PHOTON_REALTIME_APP_ID = ""
+PHOTON_VOICE_APP_ID = ""
+PHOTON_CHAT_APP_ID = ""
+PHOTON_NAME_SERVER = ""
+PHOTON_NAME_SERVER_PORT = "0"
+
+# Features
+ENABLE_IMAGE_SIGNING = "true"
+ENABLE_TELEMETRY = "false"
+ENABLE_EAC = "true"
+ENABLE_SERVICE_DISCOVERY = "true"
+
+# Database
+DB_CLIENT = "sqlite3"
+DB_PATH = "./database/recverse.db"
+
+# Photon
+PHOTON_REALTIME_APP_ID = ""
+PHOTON_VOICE_APP_ID = ""
+PHOTON_CHAT_APP_ID = ""
+PHOTON_NAME_SERVER = ""
+PHOTON_NAME_SERVER_PORT = "0"
+
+[triggers]
+crons = []
+
+[observability]
+enabled = true

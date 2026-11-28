@@ -1,0 +1,48 @@
+{
+  "name": "recverse-server",
+  "version": "1.0.0",
+  "description": "RecVerse Server - Monolithic Node.js implementation for Rec Room private server (February 2023 build)",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "deploy": "wrangler deploy",
+    "dev:workers": "wrangler dev",
+    "migrate": "node migrations/run.js",
+    "test": "node --test test/**/*.test.js",
+    "lint": "eslint ."
+  },
+  "keywords": [
+    "recroom",
+    "private-server",
+    "recverse",
+    "recflare",
+    "cloudflare-workers"
+  ],
+  "author": "RecVerse Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "morgan": "^1.10.0",
+    "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.3.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.1",
+    "ws": "^8.17.0",
+    "sqlite3": "^5.1.7",
+    "pg": "^8.11.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "wrangler": "^3.70.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
